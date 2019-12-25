@@ -1,0 +1,9 @@
+Django
+gunicorn
+mysql
+mysqlclient
+djangorestframework
+djangorestframework-jwt
+markdown
+django-filter
+django-cors-headers
