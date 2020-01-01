@@ -53,7 +53,8 @@
         } else {
           return this.items.filter(item => {
             return this.searchFields.some((field) => {
-              return item[field].toLowerCase().indexOf(this.search.toLowerCase()) > -1
+              if(item[field])return item[field].toLowerCase().indexOf(this.search.toLowerCase()) > -1;
+              else return false;
             });
           })
         }

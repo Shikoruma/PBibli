@@ -19,3 +19,10 @@ class LoanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Loan
         fields = '__all__'
+
+class AddBookSerializer(serializers.Serializer):
+    """
+    Serializer for bulk add book
+    """
+    isbn = serializers.CharField(required=True)
+

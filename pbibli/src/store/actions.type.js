@@ -8,6 +8,7 @@ export const FETCH_BOOKS = "fetchBooks";
 export const UPDATE_BOOK = "updateBook";
 export const GET_BOOK = "getBook";
 export const CREATE_BOOK = "setBook";
+export const FIND_BOOK = "findBook";
 
 export const FETCH_PERSONS = "fetchPersons";
 export const UPDATE_PERSON = "updatePerson";

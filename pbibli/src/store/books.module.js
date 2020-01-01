@@ -8,6 +8,7 @@ import {
     UPDATE_BOOK,
     GET_BOOK,
     CREATE_BOOK,
+    FIND_BOOK,
 } from "./actions.type";
 import {
     SET_BOOKS,
@@ -73,6 +74,15 @@ export const actions = {
             }) => {
                 context.commit(SET_BOOK, data);
                     return data;
+            });
+    },
+    [FIND_BOOK](context, isbn) {
+            ApiService.setHeader();
+        return ApiService.post("books/find_book/",{'isbn':isbn})
+            .then(({
+                data
+            }) => {
+                return data;
             });
     },
 

@@ -1,13 +1,21 @@
 <template>
   <div>
     <b-card-group deck>
-      <SearchList title="Books" v-bind:items="books" v-slot="slotProps" v-if="!update && !add" v-on:select="selectObject" v-bind:searchFields="['title']" addbutton="true" v-on:add="addObject">
-        {{ slotProps.item.title }}
+      <SearchList title="Books" v-bind:items="books" v-slot="slotProps" v-if="!update && !add" v-on:select="selectObject" v-bind:searchFields="['title', 'serie_title', 'author']" addbutton="true" v-on:add="addObject">
+       {{ slotProps.item.serie_title ?  slotProps.item.serie_title+" :" : '' }} {{ slotProps.item.title }}
       </SearchList>
     </b-card-group>
 
     <b-card-group deck v-if="update || add">
       <div class="card">
+        <b-form @submit="findBook" v-if="add">
+          <b-input-group label="Find">
+            <input class="form-control" id="user" v-model="isbnfind" ref="findinput" required></input>
+            <b-input-group-append>
+                <b-button type="submit" variant="primary">Add</b-button>
+             </b-input-group-append>
+          </b-input-group>
+        </b-form>
         <b-form @submit="saveObject">
           <div class="card-header">
             <b-row>
@@ -27,7 +35,7 @@
           </div>
           <b-card-body>
             <b-form-group id="isbn-group" label="ISBN:" label-for="isbn">
-              <b-form-input id="ibns" v-model="book.isbn" required></b-form-input>
+              <b-form-input id="ibns" v-model="book.isbn" ref="isbn" required></b-form-input>
             </b-form-group>
             <b-form-group id="input-group-1" label="Titre:" label-for="input-1">
               <b-form-input id="input-1" v-model="book.title" required></b-form-input>
@@ -62,7 +70,7 @@
 
 <script>
   import { mapGetters } from "vuex";
-  import { GET_BOOK, UPDATE_BOOK, CREATE_BOOK, FETCH_BOOKS, } from "@/store/actions.type";
+  import { GET_BOOK, UPDATE_BOOK, CREATE_BOOK, FETCH_BOOKS,FIND_BOOK } from "@/store/actions.type";
   import { EditorMixin } from "@/common/mixins";
   import SearchList from "@/components/SearchList";
   import DynList from "@/components/DynList";
@@ -74,6 +82,7 @@
     data() {
       return {
         emptyObject:{ num_volume: 1, demat:false },
+        isbnfind:"",
         actions:{
           GET:GET_BOOK,
           UPDATE:UPDATE_BOOK,
@@ -89,5 +98,40 @@
         return this.object
       },
     },
+    methods: {
+        saveObject(e) {
+          e.preventDefault();
+          if (this.update) {
+            this.waiting=true;
+            this.$store.dispatch(this.actions.UPDATE, { id: this.object.id, data: this.object }).then((data) => {
+              this.object = Object.assign({}, data);
+              console.log(this.objectName+' updated')
+              this.$bvModal.msgBoxOk(this.objectName+' updated')
+              this.waiting=false;
+            }).catch((e) => {
+              this.handleErrors(e)
+            });
+          } else {
+            this.waiting=true;
+            this.$store.dispatch(this.actions.CREATE, { data: this.object }).then((data) => {
+              this.$refs['findinput'].focus();
+              this.isbnfind=""
+              this.object = Object.assign({}, this.emptyObject);
+              this.waiting=false;
+            }).catch((e) => {
+              this.handleErrors(e)
+            });
+          }
+        },
+
+        findBook(){
+          this.$store.dispatch(FIND_BOOK, this.isbnfind).then((data) => {
+                this.object = Object.assign({},this.emptyObject, data);
+                this.$refs['isbn'].focus();
+            }).catch((e) => {
+                this.handleErrors(e)
+            });
+        }
+    }
   };
 </script>
