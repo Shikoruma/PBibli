@@ -8,11 +8,11 @@ class Book(models.Model):
     Book
     """
     isbn = models.CharField(max_length=20, unique=True)
-    serie_title = models.CharField(max_length=30,null=True, blank=True)
-    title = models.CharField(max_length=30)
+    serie_title = models.CharField(max_length=50,null=True, blank=True)
+    title = models.CharField(max_length=50)
     num_volume = models.IntegerField(default=1)
-    author = models.CharField(max_length=30)
-    localisation = models.CharField(max_length=20,null=True, blank=True)
+    author = models.CharField(max_length=40)
+    localisation = models.CharField(max_length=30,null=True, blank=True)
     demat = models.BooleanField()
     abstract = models.CharField(max_length=200,null=True, blank=True)
 
@@ -24,7 +24,7 @@ class Person(models.Model):
     Person who loan a book
     """
     nickname = models.CharField(max_length=20)
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=30)
     contact = models.CharField(max_length=30)
 
     def __str__(self):
