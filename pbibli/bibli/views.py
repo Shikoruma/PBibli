@@ -32,36 +32,39 @@ class BookViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             r = requests.get('http://www.sudoc.fr/services/isbn2ppn/'+serializer.data['isbn'])
             tree = ElementTree.fromstring(r.content)
-            ppn=tree[0][1][0].text
-            r = requests.get('http://www.sudoc.fr/'+ppn+'.xml')
-            tree = ElementTree.fromstring(r.content)
-            bo = {}
-            bo['isbn']=serializer.data['isbn']
-            bo['title']=tree.findtext("./datafield[@tag='200']/subfield[@code='a']")
-            bo['author']=tree.findtext("./datafield[@tag='200']/subfield[@code='f']")
-            bo['serie_title']=tree.findtext("./datafield[@tag='461']/subfield[@code='t']")
-            bo['num_volume']=tree.findtext("./datafield[@tag='461']/subfield[@code='v']")
-            if(bo['serie_title'] is None):
-                bo['serie_title']=tree.findtext("./datafield[@tag='517']/subfield[@code='a']")
-                bo['num_volume']=tree.findtext("./datafield[@tag='517']/subfield[last()]")
-            if(bo['serie_title'] is None):
-                bo['serie_title']=tree.findtext("./datafield[@tag='454']/subfield[@code='t']")
-                bo['num_volume']=tree.findtext("./datafield[@tag='454']/subfield[last()]")
+            ppn=tree.findtext("./query/*[last()]/ppn")
+            if ppn is not None:
+                r = requests.get('http://www.sudoc.fr/'+ppn+'.xml')
+                tree = ElementTree.fromstring(r.content)
+                bo = {}
+                bo['isbn']=serializer.data['isbn']
+                bo['title']=tree.findtext("./datafield[@tag='200']/subfield[@code='a']")
+                bo['author']=tree.findtext("./datafield[@tag='200']/subfield[@code='f']")
+                bo['serie_title']=tree.findtext("./datafield[@tag='461']/subfield[@code='t']")
+                bo['num_volume']=tree.findtext("./datafield[@tag='461']/subfield[@code='v']")
+                if(bo['serie_title'] is None):
+                    bo['serie_title']=tree.findtext("./datafield[@tag='517']/subfield[@code='a']")
+                    bo['num_volume']=tree.findtext("./datafield[@tag='517']/subfield[last()]")
+                if(bo['serie_title'] is None):
+                    bo['serie_title']=tree.findtext("./datafield[@tag='454']/subfield[@code='t']")
+                    bo['num_volume']=tree.findtext("./datafield[@tag='454']/subfield[last()]")
 
-            if bo['num_volume'] is None:
-                bo['num_volume']=1
-            elif not bo['num_volume'].isdigit():
-                digits = re.findall(r'(\d+)',bo['num_volume'])
-                if len(digits) > 0:
-                    bo['num_volume']=digits[0]
-            bo['demat']=False
-            boser=BookSerializer(data=bo)
-            if boser.is_valid():
-                return Response(boser.data, status=status.HTTP_200_OK)
-            else:
-                return Response(boser.errors,
+                if bo['num_volume'] is None:
+                    bo['num_volume']=1
+                elif not bo['num_volume'].isdigit():
+                    digits = re.findall(r'(\d+)',bo['num_volume'])
+                    if len(digits) > 0:
+                        bo['num_volume']=digits[0]
+                bo['demat']=False
+                boser=BookSerializer(data=bo)
+                if boser.is_valid():
+                    return Response(boser.data, status=status.HTTP_200_OK)
+                else:
+                    return Response(boser.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+            else: 
+                return Response({'error': 'Aucune notice n\'est associée a cet isbn.'},
                         status=status.HTTP_400_BAD_REQUEST)
-
         return Response(serializer.errors,
                         status=status.HTTP_400_BAD_REQUEST)
 
