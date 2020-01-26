@@ -7,7 +7,7 @@ class Book(models.Model):
     """
     Book
     """
-    isbn = models.CharField(max_length=20)
+    isbn = models.CharField(max_length=20, unique=True)
     serie_title = models.CharField(max_length=30,null=True, blank=True)
     title = models.CharField(max_length=30)
     num_volume = models.IntegerField(default=1)

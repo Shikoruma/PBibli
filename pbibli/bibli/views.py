@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework import filters
-import requests
+import requests, re
 from xml.etree import ElementTree
 
 from .serializers import BookSerializer, LoanSerializer, PersonSerializer, AddBookSerializer
@@ -41,8 +41,19 @@ class BookViewSet(viewsets.ModelViewSet):
             bo['author']=tree.findtext("./datafield[@tag='200']/subfield[@code='f']")
             bo['serie_title']=tree.findtext("./datafield[@tag='461']/subfield[@code='t']")
             bo['num_volume']=tree.findtext("./datafield[@tag='461']/subfield[@code='v']")
+            if(bo['serie_title'] is None):
+                bo['serie_title']=tree.findtext("./datafield[@tag='517']/subfield[@code='a']")
+                bo['num_volume']=tree.findtext("./datafield[@tag='517']/subfield[last()]")
+            if(bo['serie_title'] is None):
+                bo['serie_title']=tree.findtext("./datafield[@tag='454']/subfield[@code='t']")
+                bo['num_volume']=tree.findtext("./datafield[@tag='454']/subfield[last()]")
+
             if bo['num_volume'] is None:
                 bo['num_volume']=1
+            elif not bo['num_volume'].isdigit():
+                digits = re.findall(r'(\d+)',bo['num_volume'])
+                if len(digits) > 0:
+                    bo['num_volume']=digits[0]
             bo['demat']=False
             boser=BookSerializer(data=bo)
             if boser.is_valid():

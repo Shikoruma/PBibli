@@ -2,7 +2,7 @@
   <div>
     <b-card-group deck>
       <SearchList title="Books" v-bind:items="books" v-slot="slotProps" v-if="!update && !add" v-on:select="selectObject" v-bind:searchFields="['title', 'serie_title', 'author']" addbutton="true" v-on:add="addObject">
-       {{ slotProps.item.serie_title ?  slotProps.item.serie_title+" :" : '' }} {{ slotProps.item.title }}
+       {{ slotProps.item.serie_title ?  slotProps.item.serie_title+" ("+slotProps.item.num_volume+") :" : '' }} {{ slotProps.item.title }}
       </SearchList>
     </b-card-group>
 
@@ -15,6 +15,10 @@
                 <b-button type="submit" variant="primary">Add</b-button>
              </b-input-group-append>
           </b-input-group>
+          {{ errors }}
+          <b-form-invalid-feedback :state="errors" >
+          {{ errors }}
+          </b-form-invalid-feedback>
         </b-form>
         <b-form @submit="saveObject">
           <div class="card-header">
@@ -128,6 +132,7 @@
           this.$store.dispatch(FIND_BOOK, this.isbnfind).then((data) => {
                 this.object = Object.assign({},this.emptyObject, data);
                 this.$refs['isbn'].focus();
+                this.errors=null
             }).catch((e) => {
                 this.handleErrors(e)
             });
