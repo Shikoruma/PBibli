@@ -55,6 +55,9 @@ class BookViewSet(viewsets.ModelViewSet):
                     digits = re.findall(r'(\d+)',bo['num_volume'])
                     if len(digits) > 0:
                         bo['num_volume']=digits[0]
+                    else:
+                        bo['serie_title']=None
+                        bo['num_volume']=1
                 bo['demat']=False
                 boser=BookSerializer(data=bo)
                 if boser.is_valid():
