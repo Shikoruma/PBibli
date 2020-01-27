@@ -24,8 +24,8 @@ class Person(models.Model):
     Person who loan a book
     """
     nickname = models.CharField(max_length=20)
-    name = models.CharField(max_length=30)
-    contact = models.CharField(max_length=30)
+    name = models.CharField(max_length=30, null=True, blank=True)
+    contact = models.CharField(max_length=40, null=True, blank=True)
 
     def __str__(self):
         return self.nickname

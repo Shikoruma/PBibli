@@ -3,7 +3,15 @@
     <b-card-group deck>
       <SearchList title="Loans" v-bind:items="loans" v-slot="slotProps" v-if="!update && !add" v-on:select="selectObject" v-bind:searchFields="searchLoans" addbutton="true" v-on:add="addObject">
         {{ person_dict[slotProps.item.person]? person_dict[slotProps.item.person].nickname:'' }}
-        {{ book_dict[slotProps.item.book]? book_dict[slotProps.item.book].title:'' }}
+        <template v-if="book_dict[slotProps.item.book]">
+            <template v-if="book_dict[slotProps.item.book].serie_title">
+                {{  book_dict[slotProps.item.book].serie_title+" ("+book_dict[slotProps.item.book].num_volume+") :"}} |
+            </template>
+            {{book_dict[slotProps.item.book].title}}
+            <template v-if="slotProps.item.due_date">
+               | {{ slotProps.item.due_date }}
+            </template>
+        </template>
       </SearchList>
     </b-card-group>
 
@@ -43,6 +51,7 @@
           </b-form-group>
           </b-card-body>
         </b-form>
+        {{ loan.due_date }}
       </div>
     </b-card-group>
   </div>
@@ -95,11 +104,15 @@
     methods: {
         searchLoans(items,search){
           return items.filter(item => {
+            //if (item.return_date) return false;
             if (search.length == 0) return true;
             search = search.toLowerCase()
             var book=this.book_dict[item.book]
             if(book.serie_title && book.serie_title.toLowerCase().indexOf(search) > -1) return true 
             return this.person_dict[item.person].nickname.toLowerCase().indexOf(search) > -1 || book.title.toLowerCase().indexOf(search) > -1;
+        }).sort((a,b) => {
+            if(!a.due_date) return 1;
+            return a.due_date > b.due_date;
           })
         },
     },

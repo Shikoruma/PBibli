@@ -54,6 +54,8 @@ export const actions = {
         id,
         data
     }) {
+        if(!data['due_date'])data['due_date']=null
+        if(!data['return_date'])data['return_date']=null
             ApiService.setHeader();
         return ApiService.update("loans",id, data)
             .then(({
