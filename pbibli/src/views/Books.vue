@@ -31,7 +31,10 @@
               </b-col>
               <b-col>
                 <template v-if="isAuthenticated">
-                  <b-button class="float-right" type="submit" v-if="update" variant="primary">Update</b-button>
+                  <div class="btn-group float-right" role="group" v-if="update">
+                    <b-button v-on:click="copyBook" variant="primary">Copy</b-button>
+                    <b-button type="submit" variant="primary">Update</b-button>
+                  </div>
                   <b-button class="float-right" type="submit" v-if="add" variant="primary">Add</b-button>
                 </template>
               </b-col>
@@ -126,6 +129,11 @@
               this.handleErrors(e)
             });
           }
+        },
+        copyBook(){
+            this.object = Object.assign(this.object, {'id':null, 'isbn':''})
+            this.update=false;
+            this.add=true;
         },
 
         findBook(){
