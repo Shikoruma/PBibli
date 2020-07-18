@@ -20,7 +20,7 @@ cd PBibli
 #python3 must refer to python 3.6 or higher
 python3 -m venv venv
 . ./venv/bin/activate
-pip install -r ../requirements.txt
+pip install -r requirements.txt
 ```
 
 Initiate django project
@@ -31,8 +31,8 @@ cp pbiblisite/local_settings.py.example pbiblisite/local_settings.py
 #Edit local_settings with your needs
 edit pbiblisite/local_settings.py
 #Create a secret key, you can find generator on internet
-mkdir ../config
-edit ../config/secretkey.txt
+mkdir ./config
+edit ./config/secretkey.txt
 python manage.py migrate
 
 ```
@@ -44,8 +44,8 @@ npm install
 cp .env.local.example .env.local
 #Edit .env.local with your needs
 edit .env.local
-mkdir ./static
-npm build
+mkdir ../static
+npm run build
 ```
 
 Create first admin user. 
@@ -54,3 +54,13 @@ Create first admin user.
 python manage.py createsuperuser
 ```
 
+
+Configuration d'un serveur nginx, un fichier exemple mondomaine.fr.exemple est disponible (utilisation de certbot)
+```
+#lancement du server
+cd pbiblisite/frontend
+npm build
+cd ..
+python manage.py collectstatic
+gunicorn pbiblisite.wsgi --bind 0.0.0.0:8000
+```

@@ -1,0 +1,45 @@
+server {
+    server_name mondomaine.fr;
+
+    listen [::]:443 ssl ipv6only=on; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/mondomaine.fr/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/mondomaine.fr/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+    gzip on;
+    gzip_types text/plain text/css application/javascript application/json;
+    gzip_vary on;
+    location / {
+      proxy_pass http://localhost:8000;
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection 'upgrade';
+      proxy_set_header Host $host;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_cache_bypass $http_upgrade;
+    }
+
+    location /static {
+      include  /etc/nginx/mime.types;
+      autoindex on;
+      alias /HOME/PBibli/pbiblisite/static;
+    }
+}
+
+server {
+    if ($host = bibli.germainlemasson.fr) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    listen [::]:80;
+    server_name mondomaine.fr;
+    return 404; # managed by Certbot
+
+
+}
+
