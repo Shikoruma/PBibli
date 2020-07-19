@@ -52,7 +52,8 @@ class BookSerializer(serializers.ModelSerializer):
         model = Book
         fields = '__all__'
         #exclude = ['owner']
-        read_only_fields = ('prettytitle',)
+        read_only_fields = ('prettytitle','owner',)
+
 
 class LoanSerializer(serializers.ModelSerializer):
     

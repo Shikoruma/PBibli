@@ -57,7 +57,7 @@
               >Modifier</router-link
             >
             <router-link
-              class="btn btn-primary"
+              class="btn btn-secondary"
               role="button"
               :to="{
                 name: 'loanout',

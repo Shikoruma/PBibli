@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from rest_framework import viewsets, mixins, status, generics
+from rest_framework import viewsets, mixins, status, generics, serializers
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
@@ -103,9 +103,19 @@ class BookViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(owner = self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        try:
+            Book.objects.get(owner=self.request.user, isbn=serializer.validated_data['isbn'])
+            raise serializers.ValidationError({'non_field_error':'Vous possèdez déjà un livre avec cet isbn'})
+        except Book.DoesNotExist:
+            serializer.save(owner=self.request.user)
 
     def perform_update(self, serializer):
+        try:
+            book = Book.objects.get(owner=self.request.user, isbn=serializer.validated_data['isbn'])
+            if(book.id != serializer.instance.id):
+                raise serializers.ValidationError({'non_field_error':'Vous possèdez déjà un livre avec cet isbn'})
+        except Book.DoesNotExist:
+            pass
         serializer.save(owner=self.request.user)
     
     @action(methods=['post'], detail=False, serializer_class=AddBookSerializer)

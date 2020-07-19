@@ -33,6 +33,7 @@
               class="btn btn-primary"
               v-if="!confirmFooter"
               @click="close"
+              ref="okbut"
             >
               Ok
             </button>
@@ -49,6 +50,7 @@
               class="btn btn-danger"
               v-if="confirmFooter"
               @click="confirm(false)"
+              ref="nobut"
             >
               Non
             </button>
@@ -104,6 +106,10 @@ export const Modal = {
     confirm(val) {
       this.$emit("confirm", val);
     }
+  },
+  mounted(){
+    if(this.confirmFooter) this.$refs.nobut.focus()
+    else this.$refs.okbut.focus()
   }
 };
 export default Modal;

@@ -133,6 +133,11 @@ export const EditMixin = {
             // eslint-disable-next-line
             console.log(this.object_name + " updated");
             showMsgOk(this.object_name + " updated");
+          })
+          .catch(error => {
+            console.log(error.response);
+            if(error.response.data.non_field_error)
+              showMsgOk(error.response.data.non_field_error);
           });
       } else {
         document.querySelector("#editor-form").reportValidity();
@@ -158,6 +163,8 @@ export const EditMixin = {
           })
           .catch(error => {
             console.log(error.response);
+            if(error.response.data.non_field_error)
+              showMsgOk(error.response.data.non_field_error);
           });
       } else {
         document.querySelector("#editor-form").reportValidity();

@@ -11,7 +11,7 @@
               :to="{ name: 'books' }"
               >Retour</router-link
             ><router-link
-              class="btn btn-warning"
+              class="btn btn-secondary"
               role="button"
               :to="{
                 name: 'loanout',
@@ -34,6 +34,8 @@
                       class="form-control"
                       type="text"
                       v-on:keyup.enter="findByISBN"
+                      autofocus
+                      ref="isbn"
                       required
                     />
                     <div class="input-group-append" v-if="is_new">
@@ -151,6 +153,7 @@
 </template>
 
 <script>
+import { showMsgOk } from "@/components/Modal";
 import { EditMixin } from "@/common/mixins";
 // @ is an alias to /src
 export default {
@@ -161,7 +164,8 @@ export default {
       ressource: "books",
       new_label: "Nouveau Livre",
       object_name: "Livre",
-      searching: false
+      searching: false,
+      firstload:true,
     };
   },
   computed: {},
@@ -189,6 +193,7 @@ export default {
         localisation: this.object.localisation,
         demat: this.object.demat
       });
+      this.firstload=true
       this.$router.push({ name: "book", params: { bookid: "new" } });
     },
     findByISBN() {
@@ -201,11 +206,18 @@ export default {
             this.searching = false;
           })
           .catch(e => {
-            console.log(e.response);
+            showMsgOk(e.response.data.error);
             this.searching = false;
           });
       }
     }
+  },
+  updated() {
+      if(this.$refs.isbn && this.firstload) 
+      {
+        this.$refs.isbn.focus()
+        this.firstload=false
+      }
   }
 };
 </script>
